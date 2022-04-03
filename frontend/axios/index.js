@@ -4,7 +4,7 @@ import axios from "axios";
 export function getAxiosWithAuth() {
   return axios.create({
     headers: {
-      Authorization: window.localStorage.getItem("token"),
+      Authorization: localStorage.getItem("token"),
     },
   });
 }

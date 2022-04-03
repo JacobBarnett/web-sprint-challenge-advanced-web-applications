@@ -36,7 +36,7 @@ export default function App() {
     // In any case, we should redirect the browser back to the login screen,
     // using the helper above.
     setMessage("Goodbye!");
-    window.localStorage.setItem("token", "");
+    localStorage.setItem("token", "");
     redirectToLogin();
   };
 
@@ -53,8 +53,7 @@ export default function App() {
       username,
       password,
     });
-    console.log(response);
-    window.localStorage.setItem("token", response.data.token);
+    localStorage.setItem("token", response.data.token);
     setMessage(response.data.message);
     redirectToArticles();
     setSpinnerOn(false);
@@ -102,6 +101,7 @@ export default function App() {
     // You got this!
     setMessage("");
     setSpinnerOn(true);
+    setCurrentArticleId(undefined);
     let response;
 
     response = await getAxiosWithAuth().put(
@@ -160,7 +160,7 @@ export default function App() {
           </NavLink>
         </nav>
         <Routes>
-          <Route path="/" element={<LoginForm onLogin={login} />} />
+          <Route path="/" element={<LoginForm login={login} />} />
           <Route
             path="articles"
             element={
