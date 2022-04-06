@@ -36,7 +36,7 @@ export default function App() {
     // In any case, we should redirect the browser back to the login screen,
     // using the helper above.
     setMessage("Goodbye!");
-    localStorage.setItem("token", "");
+    window.localStorage.setItem("token", "");
     redirectToLogin();
   };
 
@@ -53,7 +53,7 @@ export default function App() {
       username,
       password,
     });
-    localStorage.setItem("token", response.data.token);
+    window.localStorage.setItem("token", response.data.token);
     setMessage(response.data.message);
     redirectToArticles();
     setSpinnerOn(false);
@@ -68,14 +68,19 @@ export default function App() {
     // If something goes wrong, check the status of the response:
     // if it's a 401 the token might have gone bad, and we should redirect to login.
     // Don't forget to turn off the spinner!
-    setMessage("");
-    setSpinnerOn(true);
-    const response = await getAxiosWithAuth().get(
-      "http://localhost:9000/api/articles"
-    );
-    setArticles(response.data.articles);
-    setMessage(response.data.message);
-    setSpinnerOn(false);
+    try {
+      setMessage("");
+      setSpinnerOn(true);
+      const response = await getAxiosWithAuth().get(
+        "http://localhost:9000/api/articles"
+      );
+      setArticles(response.data.articles);
+      setMessage(response.data.message);
+      setSpinnerOn(false);
+    } catch (e) {
+      setSpinnerOn(false);
+      redirectToLogin();
+    }
   };
 
   const postArticle = async (article) => {
@@ -83,57 +88,72 @@ export default function App() {
     // The flow is very similar to the `getArticles` function.
     // You'll know what to do! Use log statements or breakpoints
     // to inspect the response from the server.
-    setMessage("");
-    setSpinnerOn(true);
-    let response;
+    try {
+      setMessage("");
+      setSpinnerOn(true);
+      let response;
 
-    response = await getAxiosWithAuth().post(
-      `http://localhost:9000/api/articles`,
-      article
-    );
-    setArticles([...articles, response.data.article]);
-    setMessage(response.data.message);
-    setSpinnerOn(false);
+      response = await getAxiosWithAuth().post(
+        `http://localhost:9000/api/articles`,
+        article
+      );
+      setArticles([...articles, response.data.article]);
+      setMessage(response.data.message);
+      setSpinnerOn(false);
+    } catch (e) {
+      setSpinnerOn(false);
+      redirectToLogin();
+    }
   };
 
   const updateArticle = async ({ article_id, article }) => {
     // ✨ implement
     // You got this!
-    setMessage("");
-    setSpinnerOn(true);
-    setCurrentArticleId(undefined);
-    let response;
+    try {
+      setMessage("");
+      setSpinnerOn(true);
+      setCurrentArticleId(undefined);
+      let response;
 
-    response = await getAxiosWithAuth().put(
-      `http://localhost:9000/api/articles/${article_id}`,
-      article
-    );
-    const newArticles = articles.map((art) => {
-      if (art.article_id === article_id) {
-        return response.data.article;
-      }
-      return art;
-    });
-    setArticles(newArticles);
-    setMessage(response.data.message);
-    setSpinnerOn(false);
+      response = await getAxiosWithAuth().put(
+        `http://localhost:9000/api/articles/${article_id}`,
+        article
+      );
+      const newArticles = articles.map((art) => {
+        if (art.article_id === article_id) {
+          return response.data.article;
+        }
+        return art;
+      });
+      setArticles(newArticles);
+      setMessage(response.data.message);
+      setSpinnerOn(false);
+    } catch (e) {
+      setSpinnerOn(false);
+      redirectToLogin();
+    }
   };
 
   const deleteArticle = async (article_id) => {
     // ✨ implement
-    setMessage("");
-    setSpinnerOn(true);
-    let response;
+    try {
+      setMessage("");
+      setSpinnerOn(true);
+      let response;
 
-    response = await getAxiosWithAuth().delete(
-      `http://localhost:9000/api/articles/${article_id}`
-    );
-    const newArticles = articles.filter((art) => {
-      return art.article_id !== article_id;
-    });
-    setArticles(newArticles);
-    setMessage(response.data.message);
-    setSpinnerOn(false);
+      response = await getAxiosWithAuth().delete(
+        `http://localhost:9000/api/articles/${article_id}`
+      );
+      const newArticles = articles.filter((art) => {
+        return art.article_id !== article_id;
+      });
+      setArticles(newArticles);
+      setMessage(response.data.message);
+      setSpinnerOn(false);
+    } catch (e) {
+      redirectToLogin();
+      setSpinnerOn(false);
+    }
   };
 
   const currentArticle = articles.find(
